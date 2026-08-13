@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  REQUESTER
+  REVIEWER
+  ADMIN
+}
+
+enum AccountStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum RequestStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  PAID
+}
+
+enum Category {
+  TRAVEL
+  MEALS
+  OFFICE_SUPPLIES
+  SOFTWARE_SUBSCRIPTIONS
+  EVENT_EXPENSES
+  TRAINING
+  OTHER
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  passwordHash String
+  name         String
+  role         Role
+  status       AccountStatus @default(ACTIVE)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  requests      ReimbursementRequest[] @relation("RequesterRequests")
+  reviewedItems ReimbursementRequest[] @relation("ReviewerRequests")
+  historyEvents RequestHistory[]
+  notifications Notification[]
+}
+
+model ReimbursementRequest {
+  id           String        @id @default(uuid())
+  title        String
+  amount       Decimal       @db.Decimal(10, 2)
+  expenseDate  DateTime
+  category     Category
+  description  String
+  status       RequestStatus @default(DRAFT)
+  rejectReason String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  requester   User   @relation("RequesterRequests", fields: [requesterId], references: [id])
+  requesterId String
+
+  reviewer   User?   @relation("ReviewerRequests", fields: [reviewerId], references: [id])
+  reviewerId String?
+
+  receipts Receipt[]
+  history  RequestHistory[]
+
+  @@index([requesterId])
+  @@index([status])
+}
+
+model Receipt {
+  id           String   @id @default(uuid())
+  fileName     String
+  mimeType     String
+  sizeBytes    Int
+  storageKey   String
+  uploadedAt   DateTime @default(now())
+
+  request   ReimbursementRequest @relation(fields: [requestId], references: [id])
+  requestId String
+
+  @@index([requestId])
+}
+
+model RequestHistory {
+  id           String   @id @default(uuid())
+  action       String
+  previousStatus RequestStatus?
+  newStatus      RequestStatus?
+  comment      String?
+  createdAt    DateTime @default(now())
+
+  request   ReimbursementRequest @relation(fields: [requestId], references: [id])
+  requestId String
+
+  actor   User   @relation(fields: [actorId], references: [id])
+  actorId String
+
+  @@index([requestId])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  recipient   User   @relation(fields: [recipientId], references: [id])
+  recipientId String
+
+  relatedRequestId String?
+
+  @@index([recipientId])
+}

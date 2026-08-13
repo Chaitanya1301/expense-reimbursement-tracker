@@ -48,15 +48,63 @@ How you design and build it is up to you.
 ```text
 ├── README.md               # This file - live URL and submission checklist
 ├── problem_statement.md    # Full hackathon brief
+├── compose.yaml            # Docker Compose: local Postgres (+ backend container build)
 ├── planning/
-│   └── planning.md         # Your planning document (fill this out first)
-├── src/                    # Your application code goes here
+│   └── planning.md         # Planning document
+├── src/
+│   ├── backend/             # Node.js + Express + TypeScript API, Prisma ORM
+│   └── frontend/            # React + TypeScript (Vite) frontend
 └── docs/
     ├── walkthrough.md      # Link to your 3-5 minute walkthrough video
     ├── architecture.md     # Application architecture and data-flow explanation
     ├── testing.md          # Test cases and evidence of testing
     └── reflection.md       # What you built, tradeoffs, AI tools/resources used
 ```
+
+---
+
+## 🛠️ Setup & Run (Local Development)
+
+**Prerequisites:** Node.js 20+, npm, and Docker Desktop (for local Postgres).
+
+**1. Start the database**
+
+```bash
+docker compose up -d db
+```
+
+This runs Postgres in a container on `localhost:5433` (mapped off the default 5432 to avoid clashing with any Postgres already installed on your machine).
+
+**2. Set up and run the backend**
+
+```bash
+cd src/backend
+cp .env.example .env      # defaults already point at the Docker Postgres above
+npm install
+npx prisma migrate dev    # creates the schema in Postgres
+npm run seed               # creates demo accounts (see below)
+npm run dev                 # starts the API on http://localhost:4000
+```
+
+**3. Set up and run the frontend** (in a second terminal)
+
+```bash
+cd src/frontend
+npm install
+npm run dev                 # starts the app on http://localhost:5173
+```
+
+**4. Open the app:** [http://localhost:5173](http://localhost:5173)
+
+**Demo accounts** (all use password `Password123!`):
+
+| Role | Email |
+|------|-------|
+| Requester | `requester@demo.test` |
+| Reviewer | `reviewer@demo.test` |
+| Administrator | `admin@demo.test` |
+
+**API docs:** once implemented, available at `http://localhost:4000/api/docs` (Swagger UI).
 
 ---
 
