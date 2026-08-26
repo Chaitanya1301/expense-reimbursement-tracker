@@ -3,6 +3,8 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { authRouter } from "./routes/auth";
+import { requestsRouter } from "./routes/requests";
+import { dashboardRouter } from "./routes/dashboard";
 
 const app = express();
 const port = process.env.PORT ?? 4000;
@@ -16,6 +18,8 @@ app.get("/api/health", (_req, res) => {
 });
 
 app.use("/api/auth", authRouter);
+app.use("/api/requests", requestsRouter);
+app.use("/api/dashboard", dashboardRouter);
 
 app.listen(port, () => {
   console.log(`Backend listening on http://localhost:${port}`);

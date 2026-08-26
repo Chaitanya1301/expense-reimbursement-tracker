@@ -17,6 +17,9 @@ build/
 out/
 .next/
 
+# Uploaded receipts (local dev storage — never commit user-uploaded files)
+uploads/
+
 # Logs
 *.log
 npm-debug.log*
