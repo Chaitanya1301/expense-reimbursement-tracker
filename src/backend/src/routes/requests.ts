@@ -8,6 +8,7 @@ import { prisma } from "../lib/prisma";
 import { requireAuth, requireRole } from "../middleware/auth";
 import { canTransition } from "../lib/statusTransitions";
 import { recordHistory } from "../lib/history";
+import { createNotification } from "../lib/notifications";
 import { detectReceiptType } from "../lib/fileType";
 import { createRequestSchema, updateRequestSchema, rejectSchema, listRequestsQuerySchema } from "../schemas/request";
 
@@ -330,6 +331,12 @@ requestsRouter.post("/:id/approve", requireRole(Role.REVIEWER), async (req, res)
     comment,
   });
 
+  await createNotification({
+    recipientId: existing.requesterId,
+    message: `Your request "${existing.title}" was approved.`,
+    relatedRequestId: existing.id,
+  });
+
   return res.json({ request: updated });
 });
 
@@ -363,6 +370,12 @@ requestsRouter.post("/:id/reject", requireRole(Role.REVIEWER), async (req, res) 
     comment: parsed.data.reason,
   });
 
+  await createNotification({
+    recipientId: existing.requesterId,
+    message: `Your request "${existing.title}" was rejected: ${parsed.data.reason}`,
+    relatedRequestId: existing.id,
+  });
+
   return res.json({ request: updated });
 });
 
@@ -388,6 +401,12 @@ requestsRouter.post("/:id/pay", requireRole(Role.REVIEWER), async (req, res) => 
     action: "PAID",
     previousStatus: existing.status,
     newStatus: RequestStatus.PAID,
+  });
+
+  await createNotification({
+    recipientId: existing.requesterId,
+    message: `Your request "${existing.title}" has been paid.`,
+    relatedRequestId: existing.id,
   });
 
   return res.json({ request: updated });

@@ -47,10 +47,12 @@ model User {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
-  requests      ReimbursementRequest[] @relation("RequesterRequests")
-  reviewedItems ReimbursementRequest[] @relation("ReviewerRequests")
-  historyEvents RequestHistory[]
-  notifications Notification[]
+  requests        ReimbursementRequest[] @relation("RequesterRequests")
+  reviewedItems   ReimbursementRequest[] @relation("ReviewerRequests")
+  historyEvents   RequestHistory[]
+  notifications   Notification[]
+  targetedChanges UserHistory[]           @relation("UserHistoryTarget")
+  actedChanges    UserHistory[]           @relation("UserHistoryActor")
 }
 
 model ReimbursementRequest {
@@ -107,6 +109,24 @@ model RequestHistory {
   actorId String
 
   @@index([requestId])
+}
+
+model UserHistory {
+  id             String         @id @default(uuid())
+  action         String
+  previousRole   Role?
+  newRole        Role?
+  previousStatus AccountStatus?
+  newStatus      AccountStatus?
+  createdAt      DateTime       @default(now())
+
+  targetUser   User   @relation("UserHistoryTarget", fields: [targetUserId], references: [id])
+  targetUserId String
+
+  actor   User   @relation("UserHistoryActor", fields: [actorId], references: [id])
+  actorId String
+
+  @@index([targetUserId])
 }
 
 model Notification {

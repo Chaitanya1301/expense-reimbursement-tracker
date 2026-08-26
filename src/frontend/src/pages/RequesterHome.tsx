@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { RequestForm } from "../components/RequestForm";
 import { RequestDetail } from "../components/RequestDetail";
 import { StatusBadge } from "../components/StatusBadge";
+import { NotificationBell } from "../components/NotificationBell";
 import { getRequest, listRequests, submitRequest, type ReimbursementRequest, type RequestStatus } from "../lib/requests";
 import { ApiError } from "../lib/api";
 
@@ -66,6 +67,7 @@ export function RequesterHome() {
           {user && <p>Signed in as {user.name} (Requester)</p>}
         </div>
         <div className="dashboard-header-actions">
+          <NotificationBell />
           <button onClick={() => setShowForm((v) => !v)}>{showForm ? "Cancel" : "New Request"}</button>
           <button onClick={() => void logout()}>Sign out</button>
         </div>

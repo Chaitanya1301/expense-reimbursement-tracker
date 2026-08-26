@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { RequestDetail } from "../components/RequestDetail";
 import { StatusBadge } from "../components/StatusBadge";
+import { NotificationBell } from "../components/NotificationBell";
 import {
   approveRequest,
   getDashboardSummary,
@@ -126,7 +127,10 @@ export function ReviewerHome() {
           <h1>Expense Tracker</h1>
           {user && <p>Signed in as {user.name} (Reviewer)</p>}
         </div>
-        <button onClick={() => void logout()}>Sign out</button>
+        <div className="dashboard-header-actions">
+          <NotificationBell />
+          <button onClick={() => void logout()}>Sign out</button>
+        </div>
       </header>
 
       <main>

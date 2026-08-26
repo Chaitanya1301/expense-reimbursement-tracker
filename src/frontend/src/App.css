@@ -470,3 +470,124 @@
   font-size: 22px;
   color: var(--text-h);
 }
+
+/* ---- Admin user management ---- */
+
+.section-title {
+  font-size: 18px;
+  margin: 0 0 16px;
+}
+
+.admin-row-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.admin-row-actions button {
+  font: inherit;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-h);
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.request-table select {
+  font: inherit;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-h);
+}
+
+/* ---- Notification bell ---- */
+
+.notification-bell {
+  position: relative;
+}
+
+.notification-bell > button {
+  font: inherit;
+  font-size: 18px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+}
+
+.notification-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #d1274d;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 1px 5px;
+  min-width: 16px;
+  text-align: center;
+}
+
+.notification-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  width: 320px;
+  max-width: 90vw;
+  max-height: 360px;
+  overflow-y: auto;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  z-index: 10;
+  padding: 8px;
+}
+
+.notification-dropdown ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.notification-dropdown li {
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13px;
+  text-align: left;
+}
+
+.notification-unread {
+  background: var(--accent-bg);
+  font-weight: 600;
+}
+
+.notification-read {
+  opacity: 0.7;
+}
+
+.notification-time {
+  font-size: 11px;
+  color: var(--text);
+  font-weight: 400;
+}
+
+.notification-empty {
+  padding: 12px;
+  font-size: 13px;
+  text-align: center;
+}
