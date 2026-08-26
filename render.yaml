@@ -32,7 +32,6 @@ services:
   - type: web
     name: expense-tracker-app-chaitanya1301
     runtime: static
-    plan: free
     rootDir: src/frontend
     buildCommand: npm install && npm run build
     staticPublishPath: dist
