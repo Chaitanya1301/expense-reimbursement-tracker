@@ -13,6 +13,17 @@ const loginSchema = z.object({
 });
 
 const COOKIE_MAX_AGE_MS = 8 * 60 * 60 * 1000;
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
+
+// In production, the frontend and backend are on different Render subdomains,
+// so the cookie must be sameSite: "none" (which requires secure: true) for the
+// browser to send it on cross-origin fetch() calls. Locally, both run on
+// localhost so "lax" + non-secure works over plain HTTP.
+const AUTH_COOKIE_OPTIONS = {
+  httpOnly: true,
+  sameSite: IS_PRODUCTION ? ("none" as const) : ("lax" as const),
+  secure: IS_PRODUCTION,
+};
 
 authRouter.post("/login", async (req, res) => {
   const parsed = loginSchema.safeParse(req.body);
@@ -39,12 +50,7 @@ authRouter.post("/login", async (req, res) => {
 
   const token = signAuthToken({ sub: user.id, role: user.role });
 
-  res.cookie(AUTH_COOKIE_NAME, token, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    maxAge: COOKIE_MAX_AGE_MS,
-  });
+  res.cookie(AUTH_COOKIE_NAME, token, { ...AUTH_COOKIE_OPTIONS, maxAge: COOKIE_MAX_AGE_MS });
 
   res.json({
     user: { id: user.id, email: user.email, name: user.name, role: user.role },
@@ -52,7 +58,7 @@ authRouter.post("/login", async (req, res) => {
 });
 
 authRouter.post("/logout", (_req, res) => {
-  res.clearCookie(AUTH_COOKIE_NAME);
+  res.clearCookie(AUTH_COOKIE_NAME, AUTH_COOKIE_OPTIONS);
   res.status(204).send();
 });
 
