@@ -139,7 +139,3 @@ docs/
 - Receipts are stored on local disk, which is ephemeral on Render's free tier — uploaded files can be lost on a service restart/redeploy. Fine for a demo; would need real object storage (S3, etc.) for production use.
 - No self-registration — accounts are created via a seed script only; the admin page can change an existing account's role/status but not create new ones.
 - Responsive layout has been checked at mobile and desktop widths, not yet verified at every tablet breakpoint.
-
-## Built with AI assistance
-
-This project was built working interactively with Claude Code — it wrote most of the implementation under my direction, one reviewed step at a time, while I drove the architecture and workflow decisions, reviewed each change, and verified the results myself (running the tests, checking the security behavior, testing the live deploy) rather than trusting generated output at face value.
