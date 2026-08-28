@@ -39,6 +39,47 @@ The core workflow: **Create → Submit → Review → Approve/Reject → Paid**,
 
 See [`docs/architecture.md`](./docs/architecture.md) for the full breakdown of the data model, folder structure, and security decisions.
 
+## System design
+
+Three independently deployed pieces (matching the `render.yaml` Blueprint), talking over HTTPS:
+
+```mermaid
+graph TD
+    subgraph Client
+        Browser["Browser<br/>React SPA"]
+    end
+
+    subgraph Render
+        Frontend["Frontend<br/>Static Site (Vite build)"]
+        Backend["Backend API<br/>Express + TypeScript"]
+        DB[("PostgreSQL")]
+        Disk[("Local disk<br/>(receipt files, ephemeral)")]
+    end
+
+    Browser -- "loads app" --> Frontend
+    Browser -- "fetch(), credentials: include<br/>httpOnly JWT cookie" --> Backend
+    Backend -- "Prisma ORM" --> DB
+    Backend -- "multer + magic-byte check" --> Disk
+```
+
+The frontend never talks to Postgres directly — every read/write goes through the Express API, which is the only thing that enforces auth, role checks, validation, and status-transition rules. The browser holds no token in JS-accessible storage; the session lives entirely in an httpOnly cookie, so it's invisible to any script running on the page (XSS can't steal it).
+
+**Reimbursement status lifecycle** — enforced server-side via an explicit transition allow-list, not just implied by what buttons the UI shows:
+
+```mermaid
+stateDiagram-v2
+    [*] --> Draft: requester creates
+    Draft --> Submitted: requester submits
+    Submitted --> UnderReview: reviewer starts review
+    UnderReview --> Approved: reviewer approves
+    UnderReview --> Rejected: reviewer rejects (reason required)
+    Approved --> Paid: reviewer marks paid
+    Rejected --> [*]
+    Paid --> [*]
+```
+
+A direct API call attempting an out-of-order transition (e.g. `Rejected → Paid`, or approving a `Draft`) is rejected with a 400, independent of the frontend.
+
 ## Security notes
 
 - Role-based access control is enforced entirely on the backend — every mutating route independently checks the caller's role, and reviewer actions additionally check that the reviewer isn't the request's own owner, so a requester can never approve or pay their own request.
